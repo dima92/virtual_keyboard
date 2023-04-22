@@ -66,21 +66,20 @@ const jsLoaders = () => [
   },
 ];
 
-const pages = fs
-  .readdirSync(path.resolve(__dirname, 'src'))
-  .filter((fileName) => fileName.endsWith('.html'));
+const pages = fs.readdirSync(path.resolve(__dirname, 'src')).filter((fileName) => fileName.endsWith('.html'));
 
 const plugins = () => {
   return [
     ...pages.map(
-      (page) => new HTMLWebpackPlugin({
-        template: page,
-        filename: page,
-        inject: 'body',
-        minify: {
-          collapseWhitespace: isProd,
-        },
-      }),
+      (page) =>
+        new HTMLWebpackPlugin({
+          template: page,
+          filename: page,
+          inject: 'body',
+          minify: {
+            collapseWhitespace: isProd,
+          },
+        })
     ),
     new CleanWebpackPlugin(),
     new CopyPlugin({
