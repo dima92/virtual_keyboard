@@ -190,6 +190,155 @@ class VirtualKeyboard {
     });
   }
 
+  setCaretPosition(pos) {
+    if (this.textArea.setSelectionRange) {
+      this.textArea.focus();
+      this.textArea.setSelectionRange(pos, pos);
+    } else if (this.textArea.createTextRange) {
+      const range = this.textArea.createTextRange();
+      range.collapse(true);
+      range.moveEnd('', pos);
+      range.moveStart('', pos);
+      range.select();
+    }
+  }
+
+  activeBtnHighlighting(specialBtnEl) {
+    if (this.isShiftPress) {
+      this.isShiftPress = true;
+      specialBtnEl.classList.add('active');
+    } else {
+      this.isShiftPress = false;
+      specialBtnEl.classList.remove('active');
+    }
+  }
+
+  pageLangChanging() {
+    if (localStorage.getItem('virtualKeyboardLang') === 'EN') {
+      localStorage.removeItem('virtualKeyboardLang');
+      localStorage.setItem('virtualKeyboardLang', 'RU');
+    } else if (localStorage.getItem('virtualKeyboardLang') === 'RU') {
+      localStorage.removeItem('virtualKeyboardLang');
+      localStorage.setItem('virtualKeyboardLang', 'EN');
+    }
+    this.pageLangBtn.innerText = localStorage.getItem('virtualKeyboardLang');
+
+    this.keyboard.querySelectorAll('.row').forEach((row) => {
+      row.querySelectorAll('.key').forEach((key) => {
+        const on = key.querySelector('.on');
+        const off = key.querySelector('.off');
+        on.classList.remove('on');
+        on.classList.add('off');
+        off.classList.remove('off');
+        off.classList.add('on');
+      });
+    });
+  }
+
+  symbolChoise(el) {
+    const [, , ruLowerCase, ruUpperCase, enLowerCase, enUpperCase] = el;
+    if (localStorage.getItem('virtualKeyboardLang') === 'RU' && this.isShiftPress) {
+      this.symbol = ruUpperCase;
+    } else if (localStorage.getItem('virtualKeyboardLang') === 'RU' && !this.isShiftPress) {
+      this.symbol = ruLowerCase;
+    } else if (localStorage.getItem('virtualKeyboardLang') === 'EN' && this.isShiftPress) {
+      this.symbol = enUpperCase;
+    } else if (localStorage.getItem('virtualKeyboardLang') === 'EN' && !this.isShiftPress) {
+      this.symbol = enLowerCase;
+    }
+  }
+
+  printingInTextArea(evt) {
+    this.symbol = '';
+    const targetBtn = evt.target.closest('button');
+
+    if (targetBtn) {
+      const targetSpan = targetBtn.querySelector('.on');
+      const targetBtnName = targetSpan.className.split(' ')[0];
+      const specialBtn = targetBtn.classList[1];
+
+      keyboardKeys.forEach((row) => {
+        row.forEach((el) => {
+          if (
+            el[1] === targetBtnName &&
+            (specialBtn === undefined || specialBtn === 'space' || specialBtn === 'tab' || specialBtn === 'enter')
+          ) {
+            this.symbolChoise(el);
+          }
+        });
+      });
+
+      if (specialBtn === 'tab') {
+        this.symbol = '  ';
+      }
+
+      if (specialBtn === 'enter') {
+        this.symbol = '\n';
+      }
+      this.textArea.setRangeText(this.symbol, this.textArea.selectionStart, this.textArea.selectionEnd, 'end');
+
+      if (specialBtn === 'backspace') {
+        if (this.textArea.selectionStart > 0) {
+          const pos = this.textArea.selectionStart;
+          this.textArea.value =
+            this.textArea.value.slice(0, pos - 1) + this.textArea.value.slice(pos, this.textArea.value.length);
+          this.textArea.setRangeText('', pos - 1, pos - 1, 'end');
+        }
+      }
+
+      if (specialBtn === 'del') {
+        const pos = this.textArea.selectionStart;
+        if (this.textArea.selectionStart <= this.textArea.value.length) {
+          this.textArea.value =
+            this.textArea.value.slice(0, pos) + this.textArea.value.slice(pos, this.textArea.value.length);
+          this.textArea.setRangeText('', pos, pos + 1, 'end');
+        }
+      }
+
+      const specialBtnEl = document.querySelector(`.${specialBtn}`);
+      if (specialBtn === 'shift-left' || specialBtn === 'shift-right' || specialBtn === 'capslock') {
+        if (!this.isShiftPress) {
+          specialBtnEl.classList.add('active');
+          this.caseUp();
+        } else {
+          specialBtnEl.classList.remove('active');
+          this.caseDown();
+        }
+      }
+
+      if (specialBtn === 'arrow') {
+        const pos = this.textArea.selectionStart;
+
+        if (targetBtnName === 'ArrowUp') {
+          this.setCaretPosition(pos - 70);
+        } else if (targetBtnName === 'ArrowRight') {
+          this.setCaretPosition(pos + 1);
+        } else if (targetBtnName === 'ArrowDown') {
+          this.setCaretPosition(pos + 70);
+        } else if (targetBtnName === 'ArrowLeft') {
+          if (this.textArea.selectionStart > 0) this.setCaretPosition(pos - 1);
+        }
+      }
+
+      if (specialBtn === 'alt-left') {
+        this.isAltLeftPress = this.activeBtnHighlighting(this.isAltLeftPress, specialBtnEl);
+      }
+
+      if (specialBtn === 'alt-right') {
+        this.isAltRightPress = this.activeBtnHighlighting(this.isAltRightPress, specialBtnEl);
+      }
+
+      if (specialBtn === 'ctrl-left') {
+        this.isCtrlLeftPress = this.activeBtnHighlighting(this.isCtrlLeftPress, specialBtnEl);
+      }
+
+      if (specialBtn === 'ctrl-right') {
+        this.isCtrlRightPress = this.activeBtnHighlighting(this.isCtrlRightPress, specialBtnEl);
+      }
+    }
+    this.textArea.focus();
+  }
+
   keyDownOnRealKeyboard(evt) {
     if (evt.shiftKey) {
       this.caseUp();
@@ -219,16 +368,7 @@ class VirtualKeyboard {
           evt.key !== 'ArrowLeft'
         ) {
           evt.preventDefault();
-          const [, , ruLowerCase, ruUpperCase, enLowerCase, enUpperCase] = el;
-          if (localStorage.getItem('virtualKeyboardLang') === 'RU' && this.isShiftPress) {
-            this.symbol = ruUpperCase;
-          } else if (localStorage.getItem('virtualKeyboardLang') === 'RU' && !this.isShiftPress) {
-            this.symbol = ruLowerCase;
-          } else if (localStorage.getItem('virtualKeyboardLang') === 'EN' && this.isShiftPress) {
-            this.symbol = enUpperCase;
-          } else if (localStorage.getItem('virtualKeyboardLang') === 'EN' && !this.isShiftPress) {
-            this.symbol = enLowerCase;
-          }
+          this.symbolChoise(el);
         }
       });
     });
@@ -272,6 +412,14 @@ class VirtualKeyboard {
 const virtualKeyboard = new VirtualKeyboard();
 virtualKeyboard.createMainElements();
 virtualKeyboard.createButtons();
+
+document.addEventListener('click', (evt) => {
+  if (evt.target.classList.contains('page-lang')) {
+    virtualKeyboard.pageLangChanging(evt);
+  } else {
+    virtualKeyboard.printingInTextArea(evt);
+  }
+});
 
 document.addEventListener('keydown', (evt) => {
   virtualKeyboard.keyDownOnRealKeyboard(evt);
