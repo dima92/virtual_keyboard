@@ -260,8 +260,8 @@ class VirtualKeyboard {
       keyboardKeys.forEach((row) => {
         row.forEach((el) => {
           if (
-            el[1] === targetBtnName &&
-            (specialBtn === undefined || specialBtn === 'space' || specialBtn === 'tab' || specialBtn === 'enter')
+            el[1] === targetBtnName
+            && (specialBtn === undefined || specialBtn === 'space' || specialBtn === 'tab' || specialBtn === 'enter')
           ) {
             this.symbolChoise(el);
           }
@@ -280,8 +280,8 @@ class VirtualKeyboard {
       if (specialBtn === 'backspace') {
         if (this.textArea.selectionStart > 0) {
           const pos = this.textArea.selectionStart;
-          this.textArea.value =
-            this.textArea.value.slice(0, pos - 1) + this.textArea.value.slice(pos, this.textArea.value.length);
+          this.textArea.value = this.textArea.value.slice(0, pos - 1)
+            + this.textArea.value.slice(pos, this.textArea.value.length);
           this.textArea.setRangeText('', pos - 1, pos - 1, 'end');
         }
       }
@@ -289,8 +289,8 @@ class VirtualKeyboard {
       if (specialBtn === 'del') {
         const pos = this.textArea.selectionStart;
         if (this.textArea.selectionStart <= this.textArea.value.length) {
-          this.textArea.value =
-            this.textArea.value.slice(0, pos) + this.textArea.value.slice(pos, this.textArea.value.length);
+          this.textArea.value = this.textArea.value.slice(0, pos)
+            + this.textArea.value.slice(pos, this.textArea.value.length);
           this.textArea.setRangeText('', pos, pos + 1, 'end');
         }
       }
@@ -352,20 +352,20 @@ class VirtualKeyboard {
     keyboardKeys.forEach((row) => {
       row.forEach((el) => {
         if (
-          el[1] === evt.code &&
-          evt.key !== 'Backspace' &&
-          evt.key !== 'Delete' &&
-          evt.key !== 'CapsLock' &&
-          evt.key !== 'Shift' &&
-          evt.key !== 'Control' &&
-          evt.key !== 'Meta' &&
-          evt.key !== 'Enter' &&
-          evt.key !== 'Alt' &&
-          evt.key !== 'Tab' &&
-          evt.key !== 'ArrowUp' &&
-          evt.key !== 'ArrowRight' &&
-          evt.key !== 'ArrowDown' &&
-          evt.key !== 'ArrowLeft'
+          el[1] === evt.code
+          && evt.key !== 'Backspace'
+          && evt.key !== 'Delete'
+          && evt.key !== 'CapsLock'
+          && evt.key !== 'Shift'
+          && evt.key !== 'Control'
+          && evt.key !== 'Meta'
+          && evt.key !== 'Enter'
+          && evt.key !== 'Alt'
+          && evt.key !== 'Tab'
+          && evt.key !== 'ArrowUp'
+          && evt.key !== 'ArrowRight'
+          && evt.key !== 'ArrowDown'
+          && evt.key !== 'ArrowLeft'
         ) {
           evt.preventDefault();
           this.symbolChoise(el);
