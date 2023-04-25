@@ -1,0 +1,61 @@
+{
+  "name": "virtual_keyboard",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=production webpack --mode development",
+    "build": "cross-env NODE_ENV=production webpack --mode production",
+    "start": "cross-env NODE_ENV=development webpack-dev-server --mode development --open",
+    "prettier:format": "prettier --write \"**/*.+(js|(sa|sc)ss)\"",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix",
+    "lint:fix-staged": "eslint --fix",
+    "fix": "run-s prettier:format lint:fix",
+    "deploy": "gh-pages -d dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dima92/virtual_keyboard.git"
+  },
+  "browserslist": "> 0.25%, not dead",
+  "author": "Dmitry Tkachenko <dima-tkachenko@mail.ru>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dima92/virtual_keyboard/issues"
+  },
+  "homepage": "https://github.com/dima92/virtual_keyboard#readme",
+  "dependencies": {
+    "@babel/polyfill": "^7.12.1",
+    "gh-pages": "^5.0.0",
+    "normalize.css": "^8.0.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.16.12",
+    "@babel/plugin-proposal-class-properties": "^7.16.7",
+    "@babel/plugin-transform-runtime": "^7.17.10",
+    "@babel/preset-env": "^7.16.11",
+    "babel-eslint": "^10.1.0",
+    "babel-loader": "^8.2.5",
+    "babel-plugin-module-resolver": "^5.0.0",
+    "clean-webpack-plugin": "^4.0.0",
+    "copy-webpack-plugin": "^9.1.0",
+    "cross-env": "^7.0.3",
+    "css-loader": "^6.5.1",
+    "css-minimizer-webpack-plugin": "^3.4.1",
+    "eslint": "^8.14.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-import-resolver-webpack": "^0.13.2",
+    "eslint-plugin-import": "^2.26.0",
+    "html-webpack-plugin": "^5.5.0",
+    "mini-css-extract-plugin": "^2.6.0",
+    "prettier": "^2.6.2",
+    "sass": "^1.49.11",
+    "sass-loader": "^12.6.0",
+    "style-loader": "^3.3.1",
+    "terser-webpack-plugin": "^5.3.1",
+    "webpack": "^5.72.0",
+    "webpack-cli": "^4.9.2",
+    "webpack-dev-server": "^4.9.0"
+  }
+}
