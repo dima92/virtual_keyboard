@@ -169,10 +169,116 @@ class VirtualKeyboard {
       }
     }
   }
+
+  caseUp() {
+    this.isShiftPress = true;
+    document.querySelectorAll('.on').forEach((key) => {
+      key.children[0].classList.remove('case-shown');
+      key.children[0].classList.add('case-hidden');
+      key.children[1].classList.add('case-shown');
+      key.children[1].classList.remove('case-hidden');
+    });
+  }
+
+  caseDown() {
+    this.isShiftPress = false;
+    document.querySelectorAll('.on').forEach((key) => {
+      key.children[0].classList.add('case-shown');
+      key.children[0].classList.remove('case-hidden');
+      key.children[1].classList.remove('case-shown');
+      key.children[1].classList.add('case-hidden');
+    });
+  }
+
+  keyDownOnRealKeyboard(evt) {
+    if (evt.shiftKey) {
+      this.caseUp();
+    }
+
+    if (evt.shiftKey && evt.altKey) this.pageLangChanging();
+
+    this.textArea.focus();
+    this.symbol = '';
+
+    keyboardKeys.forEach((row) => {
+      row.forEach((el) => {
+        if (
+          el[1] === evt.code &&
+          evt.key !== 'Backspace' &&
+          evt.key !== 'Delete' &&
+          evt.key !== 'CapsLock' &&
+          evt.key !== 'Shift' &&
+          evt.key !== 'Control' &&
+          evt.key !== 'Meta' &&
+          evt.key !== 'Enter' &&
+          evt.key !== 'Alt' &&
+          evt.key !== 'Tab' &&
+          evt.key !== 'ArrowUp' &&
+          evt.key !== 'ArrowRight' &&
+          evt.key !== 'ArrowDown' &&
+          evt.key !== 'ArrowLeft'
+        ) {
+          evt.preventDefault();
+          const [, , ruLowerCase, ruUpperCase, enLowerCase, enUpperCase] = el;
+          if (localStorage.getItem('virtualKeyboardLang') === 'RU' && this.isShiftPress) {
+            this.symbol = ruUpperCase;
+          } else if (localStorage.getItem('virtualKeyboardLang') === 'RU' && !this.isShiftPress) {
+            this.symbol = ruLowerCase;
+          } else if (localStorage.getItem('virtualKeyboardLang') === 'EN' && this.isShiftPress) {
+            this.symbol = enUpperCase;
+          } else if (localStorage.getItem('virtualKeyboardLang') === 'EN' && !this.isShiftPress) {
+            this.symbol = enLowerCase;
+          }
+        }
+      });
+    });
+
+    this.textArea.setRangeText(this.symbol, this.textArea.selectionStart, this.textArea.selectionEnd, 'end');
+
+    this.keyboard.querySelectorAll('.row').forEach((row) => {
+      row.querySelectorAll('.key').forEach((symb) => {
+        if (evt.code === symb.children[0].classList[0]) {
+          if (evt.key === 'CapsLock') {
+            if (symb.classList.contains('active')) {
+              symb.classList.remove('active');
+              this.caseDown();
+              this.isShiftPress = false;
+            } else {
+              symb.classList.add('active');
+              this.caseUp();
+              this.isShiftPress = true;
+            }
+          } else {
+            symb.classList.add('active');
+          }
+        }
+      });
+    });
+  }
+
+  keyUpOnRealKeyboard(evt) {
+    this.caseDown();
+
+    this.keyboard.querySelectorAll('.row').forEach((row) => {
+      row.querySelectorAll('.key').forEach((key) => {
+        if (evt.code === key.children[0].classList[0] && evt.key !== 'CapsLock') {
+          key.classList.remove('active');
+        }
+      });
+    });
+  }
 }
 
 const virtualKeyboard = new VirtualKeyboard();
 virtualKeyboard.createMainElements();
 virtualKeyboard.createButtons();
+
+document.addEventListener('keydown', (evt) => {
+  virtualKeyboard.keyDownOnRealKeyboard(evt);
+});
+
+document.addEventListener('keyup', (evt) => {
+  virtualKeyboard.keyUpOnRealKeyboard(evt);
+});
 
 window.onbeforeunload = () => 'Есть несохранённые изменения. Всё равно уходим?';

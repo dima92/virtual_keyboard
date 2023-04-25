@@ -11,7 +11,8 @@
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
     "lint:fix-staged": "eslint --fix",
-    "fix": "run-s prettier:format lint:fix"
+    "fix": "run-s prettier:format lint:fix",
+	"deploy": "gh-pages -d dist"
   },
   "repository": {
     "type": "git",
@@ -26,6 +27,7 @@
   "homepage": "https://github.com/dima92/virtual_keyboard#readme",
   "dependencies": {
     "@babel/polyfill": "^7.12.1",
+    "gh-pages": "^5.0.0",
     "normalize.css": "^8.0.1"
   },
   "devDependencies": {
